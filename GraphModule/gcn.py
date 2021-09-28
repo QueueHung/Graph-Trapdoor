@@ -94,8 +94,8 @@ class MyGCN(nn.Module):
     >>> gcn.test(idx_test)
     """
 
-    def __init__(self, nfeat, nhid, nclass, dropout=0.5, lr=0.01, weight_decay=5e-4,
-            with_relu=True, with_bias=True, device=None):
+    def __init__(self, nfeat, nhid, nclass, dropout=0.5, lr=0.01, weight_decay=5e-4, 
+            lamb=1,with_relu=True, with_bias=True, device=None):
 
         super(MyGCN, self).__init__()
 
@@ -120,7 +120,7 @@ class MyGCN(nn.Module):
         self.ori_adj_norm = None
         self.features = None
         
-        self.lamb = 1
+        self.lamb = lamb
 
     def forward(self, x, adj):
         if self.with_relu:
