@@ -179,7 +179,7 @@ class MyGCN(nn.Module):
             optimizer.zero_grad()
             output = self.forward(self.features, self.adj_norm)
             loss_train = F.nll_loss(output[idx_train], labels[idx_train]) + \
-                Parameter(torch.FloatTensor([1])) * F.nll_loss(output[idx_trap], labels[idx_trap])
+                Parameter(torch.FloatTensor([1])).to(self.device) * F.nll_loss(output[idx_trap], labels[idx_trap])
             #loss_train = F.nll_loss(output[idx_train], labels[idx_train]) 
             loss_train.backward()
             optimizer.step()
@@ -301,7 +301,7 @@ class MyGCN2(nn.Module):
         self.nfeat = nfeat
         self.hidden_sizes = [nhid]
         self.nclass = nclass
-        self.gc1 = GraphConvolution(nfeat, nhid, with_bias=with_bias)
+        self.gc1 = GraphConvolution(nfeat, nhid, with_bias=with_bias) 
         self.gc2 = GraphConvolution(nhid, nclass, with_bias=with_bias)
         self.dropout = dropout
         self.lr = lr
@@ -466,12 +466,6 @@ class MyGCN2(nn.Module):
             self.eval()
             output = self.forward(self.features, self.adj_norm)
 
-            # def eval_class(output, labels):
-            #     preds = output.max(1)[1].type_as(labels)
-            #     return f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average='micro') + \
-            #         f1_score(labels.cpu().numpy(), preds.cpu().numpy(), average='macro')
-
-            # perf_sum = eval_class(output[idx_val], labels[idx_val])
             loss_val = F.nll_loss(output[idx_val], labels[idx_val])
 
             if best_loss_val > loss_val:

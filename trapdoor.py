@@ -74,10 +74,9 @@ idx_train = np.setdiff1d(idx_train, idx_trap)
 
 adj, features, labels = preprocess(adj, features, labels)
 
-''' choose one '''
 target_gcn = ChooseGCN()
 print("test set:", target_gcn.test(idx_test))
-''' choose one '''
+
 
 model = PGDAttack(model=target_gcn, nnodes=adj.shape[0], loss_type='CE', device=device)
 model = model.to(device)
@@ -86,15 +85,8 @@ model.attack(features, adj, labels, idx_train, 10)
 modified_adj = model.modified_adj.to(device)
 modified_edge = torch.nonzero( torch.logical_xor(modified_adj.cpu(), adj) ).numpy()
 
-print(modified_edge.flatten())
+print("modified edge:")
+print(modified_edge)
 
 target_gcn.initialize()
 target_gcn.fit(features, modified_adj, labels, idx_train, idx_trap, idx_trap)
-print(target_gcn.test(idx_test))
-print()
-for u in np.unique(modified_edge.flatten()) :
-    print("u:", u)
-    two_hop = FindTwoHopNeighbor(u, adj.numpy())
-    print("Two hop neighbor:", two_hop, sep='\n')
-    print("Intersetction between two hop and idx_trap",np.intersect1d(two_hop, idx_trap), sep="\n")
-    print()
